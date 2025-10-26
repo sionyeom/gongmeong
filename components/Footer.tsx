@@ -18,7 +18,7 @@ export default function Footer({ activeTab = 'trend' }: FooterProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700">
+    <div className="fixed max-w-md mx-auto bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700">
       <div className="max-w-md mx-auto flex justify-around py-2">
         {tabs.map((tab) => (
           <button

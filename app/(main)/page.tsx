@@ -32,10 +32,10 @@ export default function TrendPage() {
   // 버블 위치 초기화
   useEffect(() => {
     const initialPositions = keywords.map(() => ({
-      x: Math.random() * 80 + 10, // 10% ~ 90% 범위
-      y: Math.random() * 70 + 15, // 15% ~ 85% 범위로 더 넓게 분산
-      vx: (Math.random() - 0.5) * 0.3, // 속도를 조금 줄임
-      vy: (Math.random() - 0.5) * 0.3
+      x: Math.random() * 85 + 7.5, // 7.5% ~ 92.5% 범위
+      y: Math.random() * 75 + 12.5, // 12.5% ~ 87.5% 범위로 더 넓게 분산
+      vx: (Math.random() - 0.5) * 0.2, // 모바일에서 속도를 더 줄임
+      vy: (Math.random() - 0.5) * 0.2
     }));
     setBubblePositions(initialPositions);
   }, []);
@@ -44,10 +44,10 @@ export default function TrendPage() {
   const checkCollision = (pos1: {x: number, y: number, vx: number, vy: number}, pos2: {x: number, y: number, vx: number, vy: number}, size1: string, size2: string) => {
     const getRadius = (size: string) => {
       switch (size) {
-        case "large": return 12; // 24px / 2
-        case "medium": return 10; // 20px / 2
-        case "small": return 8; // 16px / 2
-        default: return 10;
+        case "large": return 8; // 16px / 2
+        case "medium": return 7; // 14px / 2
+        case "small": return 6; // 12px / 2
+        default: return 7;
       }
     };
 
@@ -126,13 +126,13 @@ export default function TrendPage() {
             newY = Math.max(5, Math.min(90, newY));
           }
 
-          // 약간의 랜덤 움직임 추가
-          newVx += (Math.random() - 0.5) * 0.01;
-          newVy += (Math.random() - 0.5) * 0.01;
+          // 약간의 랜덤 움직임 추가 (모바일에서 더 부드럽게)
+          newVx += (Math.random() - 0.5) * 0.005;
+          newVy += (Math.random() - 0.5) * 0.005;
 
-          // 속도 제한
-          newVx = Math.max(-0.5, Math.min(0.5, newVx));
-          newVy = Math.max(-0.5, Math.min(0.5, newVy));
+          // 속도 제한 (모바일에서 더 느리게)
+          newVx = Math.max(-0.3, Math.min(0.3, newVx));
+          newVy = Math.max(-0.3, Math.min(0.3, newVy));
 
           newPositions[i] = {
             x: newX,
@@ -168,33 +168,33 @@ export default function TrendPage() {
       });
     };
 
-    const interval = setInterval(animate, 100);
+    const interval = setInterval(animate, 150); // 모바일에서 더 부드럽게
     return () => clearInterval(interval);
   }, [pausedBubbles]);
 
   const getSizeClasses = (size: string) => {
     switch (size) {
       case "large":
-        return "text-2xl font-semibold px-6 py-4";
+        return "text-lg font-semibold px-3 py-2";
       case "medium":
-        return "text-lg font-semibold px-4 py-3";
+        return "text-sm font-semibold px-2 py-1";
       case "small":
-        return "text-sm font-semibold px-3 py-2";
+        return "text-xs font-semibold px-2 py-1";
       default:
-        return "text-base font-semibold px-4 py-3";
+        return "text-sm font-semibold px-2 py-1";
     }
   };
 
   const getBubbleSize = (size: string) => {
     switch (size) {
       case "large":
-        return "w-24 h-24";
-      case "medium":
-        return "w-20 h-20";
-      case "small":
         return "w-16 h-16";
+      case "medium":
+        return "w-14 h-14";
+      case "small":
+        return "w-12 h-12";
       default:
-        return "w-20 h-20";
+        return "w-14 h-14";
     }
   };
 
@@ -202,14 +202,14 @@ export default function TrendPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <Header title="트렌드 생각들" />
       
-      <div className="px-4 py-6 pb-20">
+      <div className="px-2 py-4 pb-20">
         {/* 서브타이틀 */}
-        <div className="text-center mb-8">
-          <p className="text-gray-300 text-sm">지금 이 순간 사람들이 생각하고 있는 것들</p>
+        <div className="text-center mb-4">
+          <p className="text-gray-300 text-xs">지금 이 순간 사람들이 생각하고 있는 것들</p>
         </div>
 
         {/* 키워드 버블 컨테이너 */}
-        <div className="relative bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6 h-[70vh] overflow-hidden mx-4">
+        <div className="relative bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-sm border border-white/10 rounded-xl p-3 h-[60vh] overflow-hidden mx-2">
             {/* 키워드 버블들 */}
             {keywords.map((keyword, index) => {
               const position = bubblePositions[index];
@@ -218,13 +218,15 @@ export default function TrendPage() {
               return (
                 <div
                   key={keyword.name}
-                  className={`absolute cursor-pointer transition-all duration-200 hover:scale-110 ${
+                  className={`absolute cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 touch-manipulation ${
                     selectedKeyword === keyword.name ? 'scale-110 z-10' : ''
                   }`}
                   style={{
                     left: `${position.x}%`,
                     top: `${position.y}%`,
                     transform: 'translate(-50%, -50%)',
+                    minWidth: '48px',
+                    minHeight: '48px',
                   }}
                   onClick={() => {
                     const keywordIndex = keywords.findIndex(k => k.name === keyword.name);
@@ -275,15 +277,15 @@ export default function TrendPage() {
         {selectedKeyword && (
           <div 
             ref={setKeywordInfoRef}
-            className="mt-6 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-xl p-4 mx-4"
+            className="mt-4 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg p-3 mx-2"
           >
-            <h3 className="text-white text-lg font-semibold mb-2">
+            <h3 className="text-white text-base font-semibold mb-2">
               {selectedKeyword} 관련 피드로 이동
             </h3>
-            <p className="text-gray-300 text-sm">
+            <p className="text-gray-300 text-xs">
               이 키워드와 관련된 게시글들을 확인해보세요.
             </p>
-            <button className="mt-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all duration-200">
+            <button className="mt-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-gray-900 font-semibold py-2 px-3 rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all duration-200 text-sm">
               피드로 이동
             </button>
           </div>
